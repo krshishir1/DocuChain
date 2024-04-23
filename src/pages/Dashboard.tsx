@@ -2,6 +2,7 @@ import { Container, Typography, Box, Button } from "@mui/material";
 import { useState } from "react";
 
 import CreateSurveyBox from "../components/CreateSurveyBox";
+import Onboarding from "../components/Onboarding";
 
 const Dashboard = () => {
 
@@ -11,11 +12,17 @@ const Dashboard = () => {
 
   return (
     <div className="pt-36">
-      <div className="md:w-3/5 mx-auto p-4 bg-gray-100 rounded-xl" style={{minHeight: "450px"}}>
-        <Typography>
-          
-        </Typography>
+
+      <div className="md:w-3/5 mx-auto">
+        <div className="flex justify-end">
+          <div className="">
+            <button className="bg-slate-800 hover:bg-black text-primary font-bold text-xl px-6 py-3 rounded-xl">
+              Register New Document
+            </button>
+          </div>
+        </div>
       </div>
+      {/* <Onboarding /> */}
     </div>
   );
 };
