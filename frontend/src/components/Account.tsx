@@ -3,15 +3,22 @@ import { useAccount, useDisconnect } from "wagmi";
 
 import { useState } from "react";
 
+import { useDispatch } from "react-redux";
+import { setAddress } from "../store/accountSlice";
+
 const Account = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const { disconnect } = useDisconnect();
+  const dispatch = useDispatch();
 
-  //
-  //   if (isDisconnected) return <h2>Account Disconnected</h2>;
+  async function handleDisconnect() {
+    localStorage.removeItem("accountType");
+    await disconnect();
+    dispatch(setAddress({} as any));
+  }
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(e.currentTarget);
@@ -52,7 +59,7 @@ const Account = () => {
 
             {address && (
               <button
-                onClick={() => disconnect()}
+                onClick={handleDisconnect}
                 className="font-bold text-red-500 text-right"
               >
                 Disconnect

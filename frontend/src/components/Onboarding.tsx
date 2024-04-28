@@ -1,8 +1,16 @@
 import { steps, stepValue } from "../config/onboarding";
 import { useState } from "react";
 
-const Onboarding = () => {
+interface OnboardingProps {
+  register: (studentData : any) => void;
+}
+
+import { useSwitchChain } from "wagmi";
+
+const Onboarding : React.FC<any> = ({register, setStudent, switchNetwork}) => {
   const [currentStepNum, setCurrentStepNum] = useState(0);
+
+  const {switchChain} = useSwitchChain();
 
   const [values, setValues] = useState<any>(stepValue);
 
@@ -22,10 +30,12 @@ const Onboarding = () => {
     }
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setStudent(values);
+    switchNetwork({chainId: 134})
 
-    console.log(values);
+    // await register(values);
   }
 
   return (
@@ -177,7 +187,7 @@ const Onboarding = () => {
                       onClick={handleSubmit}
                       className="bg-primary text-black px-6 py-3 text-lg font-bold uppercase rounded-lg"
                     >
-                      Submit
+                      Protect Data
                     </button>
                   )}
                 </div>

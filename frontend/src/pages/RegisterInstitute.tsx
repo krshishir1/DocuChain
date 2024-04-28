@@ -1,13 +1,78 @@
 import { Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { pinFileToIPFS } from "../utils/ipfsController";
 
 import { instituteTypesList } from "../config/instituteType";
+import { contractAbi, contractAddress } from "../config/contract";
+
+import { type BaseError, useWriteContract, useTransactionReceipt, useAccount } from "wagmi";
+
+import { useDispatch } from "react-redux";
+import { setVerifier, setAvailability } from "../store/verifierSlice";
+
+const validFiles = ["image/png", "image/jpeg", "image/jpg"];
 
 const RegisterInstitute = () => {
   const [instituteName, setInstituteName] = useState("");
   const [email, setEmail] = useState("");
   const [instituteType, setInstituteType] = useState("school");
-  const [address, setAddress] = useState("");
+  const [location, setLocation] = useState("");
+  const [ipfsHash, setIpfsHash] = useState("")
+
+  const [logoFile, setLogoFile] = useState(null);
+
+  const {address} = useAccount();
+  const {writeContract, isPending, error, data : hash} = useWriteContract()
+
+  const {data: txDetails, isSuccess: transactionCompleted} = useTransactionReceipt({
+    hash
+  })
+
+  const dispatch = useDispatch()
+
+  const handleFileChange = function (e: any) {
+    const file = e.target.files[0];
+
+    if (!validFiles.includes(file.type)) {
+      alert("Wrong image file format");
+      setLogoFile(null);
+    } else {
+      setLogoFile(file);
+    }
+  };
+
+  const handleSubmit = async function (e: any) {
+    e.preventDefault();
+
+    const cid = await pinFileToIPFS(logoFile);
+
+    if(!cid) {
+      setIpfsHash("")
+      return alert("Error in uploading image to IPFS");
+    }
+
+    setIpfsHash(cid)
+    writeContract({
+      abi: contractAbi,
+      address: contractAddress,
+      functionName: "addVerifierDetails",
+      args: [instituteName, email, instituteType, location, cid],
+      account: address
+    })
+
+  };
+
+  useEffect(() => {
+
+    if(txDetails) {
+      console.log(txDetails)
+
+      dispatch(setAvailability(true))
+      dispatch(setVerifier({instituteName, email, instituteType, location, cid: ipfsHash}))
+    }
+
+  }, [transactionCompleted])
 
   return (
     <div className="pt-36">
@@ -22,6 +87,11 @@ const RegisterInstitute = () => {
         >
           Register As Institute
         </Typography>
+
+        <div>
+          {error && <p className="text-red-500">{(error as BaseError).shortMessage}</p>}
+          {ipfsHash}
+        </div>
 
         <div className="flex flex-col gap-2">
           <label>Enter Name Of Institute: </label>
@@ -62,20 +132,23 @@ const RegisterInstitute = () => {
         <div className="flex flex-col gap-2">
           <label>Address: </label>
           <textarea
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg"
           ></textarea>
         </div>
 
         <div className="flex flex-col gap-2">
           <label>Institute Logo</label>
-          <input type="file" />
+          <input type="file" onChange={handleFileChange} />
         </div>
 
         <div className="flex justify-center">
-          <button className="bg-primary px-8 py-2 rounded text-lg font-bold">
-            Submit
+          <button
+            onClick={handleSubmit}
+            className="bg-primary px-8 py-2 rounded text-lg font-bold"
+          >
+            {isPending ? "Loading..." : "Register"}
           </button>
         </div>
       </form>

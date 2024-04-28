@@ -46,6 +46,7 @@ contract DocuChain {
     mapping(address => Verifier) verifiers;
 
     string[] public documentHashes;
+    address[] public verifiersList;
 
     // Functions to handle Documents in blockchain
     /* 
@@ -220,6 +221,8 @@ contract DocuChain {
             _location,
             _logoCid
         );
+
+        verifiersList.push(msg.sender);
     }
 
     function deleteVerifier() public {
@@ -232,6 +235,25 @@ contract DocuChain {
         address _address
     ) external view returns (Verifier memory) {
         return verifiers[_address];
+    }
+
+    function getAllVerifiers() public view returns (Verifier[] memory) {
+        Verifier[] memory allVerifiers = new Verifier[](verifiersList.length);
+
+        uint256 count = 0;
+
+        for (uint256 i = 0; i < verifiersList.length; i++) {
+            if (isVerifierExists(verifiersList[i])) {
+                allVerifiers[count] = verifiers[verifiersList[i]];
+                count++;
+            }
+        }
+
+        assembly {
+            mstore(allVerifiers, count)
+        }
+
+        return allVerifiers;
     }
 
     // function generateVerifierId(string memory _name, string memory _email)

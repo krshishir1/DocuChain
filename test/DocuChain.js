@@ -70,12 +70,12 @@ describe("DocuChain Functionality", function () {
     );
 
     await sContract.addDocumentDetails(
-        "6baa6e2decc2df28b5e0ffe627febbe4",
-        "Domicile Certificate",
-        "certificate",
-        verifier.address,
-        student.address
-      );
+      "6baa6e2decc2df28b5e0ffe627febbe4",
+      "Domicile Certificate",
+      "certificate",
+      verifier.address,
+      student.address
+    );
 
     // const [docId, docName, docType, vAddress, sAddress] =
     //   await sContract.getDocumentDetails("c14850f4d6da0e87622122d35c1bd379");
@@ -87,16 +87,16 @@ describe("DocuChain Functionality", function () {
     const documents = await vContract.getDocumentsForStudent();
 
     documents.forEach(async (doc) => {
-        const [docId, docName, docType, vAddress, sAddress] = doc;
-        console.log(
-            "Details of the document: ",
-            docId,
-            docName,
-            docType,
-            vAddress,
-            sAddress
-        );
-    })
+      const [docId, docName, docType, vAddress, sAddress] = doc;
+      console.log(
+        "Details of the document: ",
+        docId,
+        docName,
+        docType,
+        vAddress,
+        sAddress
+      );
+    });
 
     // console.log(
     //   "Details of the document: ",
@@ -108,4 +108,37 @@ describe("DocuChain Functionality", function () {
     // );
   });
 
+  it("gets list of all verifiers", async function () {
+    const [owner, student, verifier] = addresses;
+
+    const vContract = await contract.connect(verifier);
+    const sContract = await contract.connect(student);
+
+    await vContract.addVerifierDetails(
+      "Saint Joseph School",
+      "example@co.in",
+      "school",
+      "Bhagalpur",
+      "random-cid"
+    );
+
+    await sContract.addVerifierDetails(
+      "JSS Academy",
+      "example@co.in",
+      "school",
+      "Noida",
+      "random-cid"
+    );
+
+    await contract.addVerifierDetails(
+      "Boring School",
+      "example@co.in",
+      "school",
+      "Bhagalpur",
+      "random-cid"
+    );
+
+    const verifiers = await contract.getAllVerifiers();
+    console.log("List of all verifiers: ", verifiers);
+  });
 });

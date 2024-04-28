@@ -8,6 +8,11 @@ import RegisterInstitute from "./pages/RegisterInstitute";
 
 import AppLayout from "./layout/AppLayout";
 
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setAddress } from "./store/accountSlice";
+import { useAccount } from "wagmi";
+
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -16,16 +21,29 @@ import {
 } from "react-router-dom";
 
 const App = function () {
+  const { address } = useAccount();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const accountType = localStorage.getItem("accountType") as string;
+
+    if(address && accountType) {
+      console.log("running and changing address")
+      dispatch(setAddress({address, type: accountType}))
+    }
+  }, [])
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route>
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Connect />} />
           <Route path="connect" element={<Connect />} />
-          <Route path="register" element={<RegisterDocument />} />
         </Route>
-        <Route path="/institute" element={<AppLayout />}>
-          <Route index element={<RegisterInstitute />} />
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="register" element={<RegisterDocument />} />
+          <Route path="institute" element={<RegisterInstitute />} />
         </Route>
       </Route>
     )

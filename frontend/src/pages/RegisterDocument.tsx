@@ -1,19 +1,90 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Typography } from "@mui/material";
 
 import { documentTypesList } from "../config/documentType";
+import { pinFileToIPFS } from "../utils/ipfsController";
+
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useTransactionReceipt,
+} from "wagmi";
+import { contractAbi, contractAddress } from "../config/contract";
 
 const RegisterDocument = () => {
   const [documentName, setDocumentName] = useState("");
   const [purpose, setPurpose] = useState("");
-  const [university, setUniversity] = useState("");
   const [documentType, setDocumentType] = useState("degree");
+  const [verifierList, setVerifierList] = useState<any>(null);
+  const [documentFile, setDocumentFile] = useState(null);
 
-  const universities = [
-    { label: "Delhi University" },
-    { label: "Mumbai University" },
-    { label: "Bangalore University" },
-  ];
+  const [verifierAddress, setVerifierAddress] = useState("");
+
+  const { address } = useAccount();
+
+  const { data: verifiers } = useReadContract({
+    abi: contractAbi,
+    address: contractAddress,
+    functionName: "getAllVerifiers",
+    account: address,
+  });
+
+  const { writeContract, isPending, error, data: hash } = useWriteContract();
+  const { data: txDetails, isSuccess: transactionComplete } =
+    useTransactionReceipt({ hash });
+
+  useEffect(() => {
+    if (Array.isArray(verifiers)) {
+      const arr = [];
+      verifiers.forEach((el) => {
+        const { verifierAddress, name } = el;
+        arr.push({ verifierAddress, label: name });
+      });
+      setVerifierList(arr);
+    }
+  }, [verifiers]);
+
+  useEffect(() => {
+    if (txDetails) {
+      console.log("txDetails", txDetails);
+      alert("Document Registered Successfully");
+    }
+  }, [transactionComplete]);
+
+  const handleVerifierChange = (e, value) => {
+    setVerifierAddress(value.verifierAddress);
+  };
+
+  const handleFileChange = async function (e: any) {
+    const file = e.target.files[0];
+    setDocumentFile(file);
+
+    // if(file.type !== "application/pdf") {
+    //   setDocumentFile(null)
+    //   return alert("Wrong file format")
+    // } else {
+    //   setDocumentFile(file)
+    // }
+  };
+
+  const handleSubmit = async function (e: any) {
+    e.preventDefault();
+
+    const cid = await pinFileToIPFS(documentFile);
+
+    if (!cid) {
+      return alert("Error in uploading document to IPFS");
+    }
+
+    writeContract({
+      abi: contractAbi,
+      address: contractAddress,
+      functionName: "addDocumentDetails",
+      args: [cid, documentName, documentType, verifierAddress, address],
+      account: address,
+    });
+  };
 
   return (
     <div className="pt-36">
@@ -21,9 +92,19 @@ const RegisterDocument = () => {
         className="md:w-1/2 mx-auto flex flex-col gap-4 bg-gray-100 py-12 px-10 rounded-xl"
         style={{ minHeight: "450px" }}
       >
-        <Typography variant="h4" sx={{fontWeight: "bold"}} className="text-center">
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: "bold" }}
+          className="text-center"
+        >
           Document Verification Details
         </Typography>
+
+        <div>
+          {error && (
+            <p className="text-red-500">{(error as BaseError).shortMessage}</p>
+          )}
+        </div>
 
         <div className="flex flex-wrap gap-4 mt-4">
           <div className="flex basis-1/2 flex-col gap-2">
@@ -53,13 +134,13 @@ const RegisterDocument = () => {
           <label>Select University For Verification</label>
 
           <Autocomplete
-            id="university"
-            options={universities}
+            id="verifier"
+            options={verifierList}
             className="bg-white"
-            renderInput={(params) => (
-              <TextField {...params} label="University" />
-            )}
-            onChange={(e, value) => setUniversity(value?.label)}
+            renderInput={(params) => {
+              return <TextField {...params} label="Select University" />;
+            }}
+            onChange={handleVerifierChange}
           />
         </div>
         <div className="flex flex-1 flex-col gap-2">
@@ -72,11 +153,14 @@ const RegisterDocument = () => {
         </div>
         <div className="flex flex-col gap-2">
           <label>Upload Document</label>
-          <input type="file" />
+          <input type="file" onChange={handleFileChange} />
         </div>
 
         <div className="flex gap-4 mt-8">
-          <button className="bg-primary px-4 py-2 rounded">
+          <button
+            onClick={handleSubmit}
+            className="bg-primary px-4 py-2 rounded"
+          >
             Register Document
           </button>
           <button className="text-black underline">Save As Draft</button>

@@ -1,25 +1,28 @@
 import { Container, Typography, Box, Button } from "@mui/material";
 import { useState } from "react";
 
-import CreateSurveyBox from "../components/CreateSurveyBox";
-import Onboarding from "../components/Onboarding";
+import StudentDashboard from "../components/StudentDashboard";
+import VerifierDashboard from "../components/VerifierDashboard";
+
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 const Dashboard = () => {
+  const userAccount = useSelector((state: RootState) => state.account);
 
-    const [modalOpen, setModal] = useState(false);
+  // const [modalOpen, setModal] = useState(false);
 
-    const handleClose = () => setModal(false);
+  // const handleClose = () => setModal(false);
 
   return (
     <div className="pt-36">
-
-      <div className="md:w-3/5 mx-auto">
-        <div className="flex justify-end">
-          <div className="">
-            <button className="bg-slate-800 hover:bg-black text-primary font-bold text-xl px-6 py-3 rounded-xl">
-              Register New Document
-            </button>
-          </div>
+      <div
+        className="md:w-3/5 mx-auto bg-gray-200/50 p-5 rounded-xl"
+        style={{ minHeight: "450px" }}
+      >
+        <div>
+          {userAccount.type === "student" && <StudentDashboard />}
+          {userAccount.type === "verifier" && <VerifierDashboard />}
         </div>
       </div>
       {/* <Onboarding /> */}

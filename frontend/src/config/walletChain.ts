@@ -1,9 +1,9 @@
-import { type Chain } from 'viem';
+import { type Chain } from 'wagmi';
 
 export const bellecour = {
   id: 0x86,
   name: 'iExec Sidechain',
-//   network: 'bellecour',
+  network: 'bellecour',
   nativeCurrency: {
     decimals: 18,
     name: 'xRLC',
