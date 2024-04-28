@@ -43,7 +43,7 @@ const Connection = () => {
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 bg-black pt-56">
-        <div className="md:w-3/5 mx-auto flex flex-col gap-16">
+        <div className="md:w-1/2 mx-auto flex flex-col gap-16">
           <Typography
             variant="h3"
             sx={{ fontWeight: "bold" }}
