@@ -6,6 +6,7 @@ import RegisterDocument from "./pages/RegisterDocument";
 import PageNotFound from "./pages/PageNotFound";
 
 import RegisterInstitute from "./pages/RegisterInstitute";
+import Features from "./pages/Features";
 
 import AppLayout from "./layout/AppLayout";
 
@@ -40,6 +41,7 @@ const App = function () {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Connect />} />
           <Route path="connect" element={<Connect />} />
+          <Route path="features" element={<Features />} />
         </Route>
         <Route path="/app" element={<AppLayout />}>
           <Route index element={<Dashboard />} />
