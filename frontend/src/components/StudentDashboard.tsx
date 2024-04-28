@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import Onboarding from "./Onboarding";
 import DisplayStudent from "./DisplayStudent";
+import DisplayStudentDocuments from "./DisplayStudentDocuments";
 
 // 11155111, 134
 
 import { contractAbi, contractAddress } from "../config/contract";
 import { IExecDataProtector } from "@iexec/dataprotector";
+
+const IEXEC_EXPLORER_URL = "https://explorer.iex.ec/bellecour/dataset";
 
 import {
   type BaseError,
@@ -24,8 +27,9 @@ import { useChainId, useSwitchChain } from "wagmi";
 
 const StudentDashboard = () => {
   const [verifierList, setVerifierList] = useState<any>(null);
-  const [protectedAddress, setProtectedAddress] = useState<any>(null);
+  const [protectedAddress, setProtectedAddress] = useState<any>();
   const [studentData, setStudentData] = useState<any>(null);
+  const [displayAccount, setDisplayAccount] = useState(false);
 
   const { address } = useAccount();
   const { connector } = useAccount() as { connector: Connector };
@@ -102,30 +106,39 @@ const StudentDashboard = () => {
     }
   };
 
+  const handleDeleteDocument = async function (cid: string) {
+    writeContract({
+      abi: contractAbi,
+      address: contractAddress,
+      functionName: "deleteDocument",
+      args: [cid],
+      account: address,
+    });
+  };
+
   useEffect(() => {
     async function fetchData() {
-      if (chainId === 134 && address && connector) {
-        console.log("fetching student data from protector");
-
-        const provider = await connector?.getProvider();
+      if (address && connector) {
+        const provider = await connector.getProvider();
         const dataProtector = new IExecDataProtector(provider);
 
         const response = await dataProtector.fetchProtectedData({
           owner: address,
-          schema: {
-            fullName: "string",
-            email: "string",
-          },
         });
 
-        console.log("response", response);
+        if (response) {
+          const protectedData = response.pop();
+          console.log("protectedData", protectedData);
+          setProtectedAddress(protectedData?.address);
+        }
       }
     }
 
     fetchData();
-  }, [protectedAddress]);
+  }, [connector]);
 
   useEffect(() => {
+    console.log("hashing");
     if (txDetails) {
       console.log("transaction", txDetails);
       fetchStudentAvailable();
@@ -202,7 +215,7 @@ const StudentDashboard = () => {
     sendData();
   }, [chainSwitched]);
 
-  console.log(availableDocuments)
+  //   console.log(availableDocuments);
 
   return (
     <>
@@ -219,13 +232,14 @@ const StudentDashboard = () => {
       </div>
 
       <div>
-        <p>{status}</p>
-        <p>Current chain: {chainId}</p>
+        {/* <p>{status}</p>
 
         <div>
           <p>Available chains: </p>
           <div className="flex gap-2"></div>
-        </div>
+        </div> */}
+
+        <p>Current chain: {chainId}</p>
 
         {error && (
           <p className="text-red-500">{(error as BaseError).shortMessage}</p>
@@ -240,41 +254,44 @@ const StudentDashboard = () => {
         />
       )}
       {(isStudent as Boolean) && student && (
-        <DisplayStudent
-          pending={isPending}
-          student={student as any}
-          deleteStudent={handleDelete}
-        />
+        <div className="mt-10">
+          <button
+            onClick={() => setDisplayAccount((val) => !val)}
+            className="bg-black text-primary font-bold rounded-xl px-4 py-2 mb-5"
+          >
+            {displayAccount ? "Hide Account" : "Display Account"}
+          </button>
+          {displayAccount && (
+            <DisplayStudent
+              pending={isPending}
+              student={student as any}
+              deleteStudent={handleDelete}
+            />
+          )}
+        </div>
+      )}
+
+      {protectedAddress && isStudent && (
+        <div className="bg-green-300/50 p-5 rounded-xl text-gray-700">
+          <h2 className="text-lg mb-4 font-bold">
+            Your data has been protected!
+          </h2>
+          <a
+            className="underline"
+            href={`${IEXEC_EXPLORER_URL}/${protectedAddress}`}
+          >
+            You can check it here!
+          </a>
+        </div>
       )}
 
       {Array.isArray(availableDocuments) &&
         availableDocuments.length &&
         isStudent && (
-          <div>
-            <h1>Available Documents</h1>
-            {availableDocuments.map((doc: any) => {
-              return (
-                <div key={doc.cid} className="flex justify-between">
-                  <p>{doc.docName}</p>
-                  <p>{doc.docType}</p>
-                  {verifierList && <p>{verifierList[doc.verifierAddress]}</p>}
-                  <button className="text-red-700 underline"
-                    onClick={() => {
-                      writeContract({
-                        abi: contractAbi,
-                        address: contractAddress,
-                        functionName: "deleteDocument",
-                        args: [doc.cid],
-                        account: address,
-                      });
-                    }}
-                  >
-                    Delete document
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+          <DisplayStudentDocuments
+            documents={availableDocuments}
+            deleteFunc={handleDeleteDocument}
+          />
         )}
     </>
   );

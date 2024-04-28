@@ -20,7 +20,7 @@ const Dashboard = () => {
         className="md:w-3/5 mx-auto bg-gray-200/50 p-5 rounded-xl"
         style={{ minHeight: "450px" }}
       >
-        <div>
+        <div className="py-20 px-10">
           {userAccount.type === "student" && <StudentDashboard />}
           {userAccount.type === "verifier" && <VerifierDashboard />}
         </div>

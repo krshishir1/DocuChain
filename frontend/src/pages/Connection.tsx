@@ -62,9 +62,9 @@ const Connection = () => {
             students with institutes for instant verification of documents.
           </Typography>
 
-          {
+          {/* {
             <h2 className="text-2xl text-white">Chain ID: {chainId}</h2>
-          }
+          } */}
 
           {true && (
             <div className="flex justify-center gap-8">

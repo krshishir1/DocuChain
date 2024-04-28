@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import DisplayVerifier from "./DisplayVerifier";
@@ -20,6 +20,8 @@ import {
 const VerifierDashboard = () => {
   const { address } = useAccount();
   const dispatch = useDispatch();
+
+  const [displayAccount, setDisplayAccount] = useState(false);
 
   const { data: isVerifier, refetch: fetchVerifierStatus } = useReadContract({
     abi: contractAbi,
@@ -100,17 +102,30 @@ const VerifierDashboard = () => {
       </div>
 
       {isVerifier && verifier && (
-        <DisplayVerifier
-          pending={isPending}
-          verifier={verifier}
-          deleteVerifier={handleDelete}
-        />
+        <div className="mt-10">
+          <button
+            onClick={() => setDisplayAccount((val) => !val)}
+            className="bg-black text-primary font-bold rounded-xl px-4 py-2 mb-5"
+          >
+            {displayAccount ? "Hide Account" : "Display Account"}
+          </button>
+          {displayAccount && (
+            <DisplayVerifier
+              pending={isPending}
+              verifier={verifier}
+              deleteVerifier={handleDelete}
+            />
+          )}
+        </div>
       )}
 
       {isVerifier &&
         Array.isArray(availableDocuments) &&
         availableDocuments.length && (
-          <DisplayVerifierDocuments documents={availableDocuments} fetchDocument={getAvailableDocuments} />
+          <DisplayVerifierDocuments
+            documents={availableDocuments}
+            fetchDocument={getAvailableDocuments}
+          />
         )}
     </>
   );

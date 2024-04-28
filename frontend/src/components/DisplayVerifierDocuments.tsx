@@ -115,7 +115,7 @@ const DisplayVerifierDocuments: React.FC<any> = ({ documents, fetchDocument }) =
                 onClick={() => setSelectedDoc(doc)}
                 className="bg-white px-8 py-4 border-2 mb-4 rounded-xl select-none cursor-pointer"
               >
-                <div className="flex gap-4">
+                <div className="flex justify-between gap-4">
                   <h2>{index + 1}</h2>
                   <h2>{docName}</h2>
                   <h2>{docType}</h2>
