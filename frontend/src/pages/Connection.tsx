@@ -16,9 +16,6 @@ import { useChainId, useSwitchChain } from "wagmi";
 const Connection = () => {
   const { open, close } = useWeb3Modal();
 
-  const chainId = useChainId();
-  const { chains, switchChain } = useSwitchChain()
-
   const {address, isConnected} = useAccount();
   const [accountType, setType] = useState<string | null>(null);
 
@@ -66,7 +63,7 @@ const Connection = () => {
             <h2 className="text-2xl text-white">Chain ID: {chainId}</h2>
           } */}
 
-          {true && (
+          {!isConnected && (
             <div className="flex justify-center gap-8">
               <button
                 onClick={() => handleConnect("student")}
