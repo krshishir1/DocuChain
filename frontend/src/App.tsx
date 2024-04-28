@@ -3,6 +3,7 @@ import React from "react";
 import Dashboard from "./pages/Dashboard";
 import Connect from "./pages/Connection";
 import RegisterDocument from "./pages/RegisterDocument";
+import PageNotFound from "./pages/PageNotFound";
 
 import RegisterInstitute from "./pages/RegisterInstitute";
 
@@ -45,6 +46,7 @@ const App = function () {
           <Route path="register" element={<RegisterDocument />} />
           <Route path="institute" element={<RegisterInstitute />} />
         </Route>
+        <Route path="*" element={<PageNotFound />} />
       </Route>
     )
   );
