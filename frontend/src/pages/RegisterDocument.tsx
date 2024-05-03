@@ -81,7 +81,7 @@ const RegisterDocument = () => {
       abi: contractAbi,
       address: contractAddress,
       functionName: "addDocumentDetails",
-      args: [cid, documentName, documentType, verifierAddress, address],
+      args: [cid, documentName, documentType, purpose, verifierAddress, address],
       account: address,
     });
   };

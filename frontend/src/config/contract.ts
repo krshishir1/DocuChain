@@ -1,4 +1,4 @@
 import Contract from "../artifacts/contracts/DocuChain.sol/DocuChain.json"
 
-export const contractAddress = "0x0806efe8c4384E7ee20EF0F6b307915101114c19";
+export const contractAddress = "0xf6EA23DA1A9F296F196a38F30d4133A8e92DEC36";
 export const contractAbi = Contract.abi

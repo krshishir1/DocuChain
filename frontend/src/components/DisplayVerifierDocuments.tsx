@@ -1,20 +1,29 @@
 import { useEffect, useState } from "react";
 
-import { useWriteContract, useTransactionReceipt, useAccount, useReadContract, type BaseError } from "wagmi";
+import {
+  useWriteContract,
+  useTransactionReceipt,
+  useAccount,
+  useReadContract,
+  type BaseError,
+} from "wagmi";
 import { contractAbi, contractAddress } from "../config/contract";
 
-const DisplaySingleDocument: React.FC<any> = ({ document, unselect, changeStatus }) => {
-  const { name, docName, docType, cid, studentAddress } = document;
+const DisplaySingleDocument: React.FC<any> = ({
+  document,
+  unselect,
+  changeStatus,
+}) => {
+  const { purpose, docName, docType, cid, studentAddress } = document;
 
   const fileUrl = `https://${import.meta.env.VITE_GATEWAY_URL}/ipfs/${cid}`;
 
-  const {data: student} = useReadContract({
+  const { data: student } = useReadContract({
     abi: contractAbi,
     address: contractAddress,
     functionName: "getStudentDetails",
-    account: studentAddress
-  })
-
+    account: studentAddress,
+  });
 
   return (
     <>
@@ -23,70 +32,89 @@ const DisplaySingleDocument: React.FC<any> = ({ document, unselect, changeStatus
       </h2>
 
       <div className="px-8 mt-10 mb-24">
-        {fileUrl && (
-          <object
-            data={fileUrl}
-            type="application/pdf"
-            className="w-full"
-            height="600"
-          >
-            <p>
-            Your browser does not support PDFs.{" "}
-            <a href={fileUrl}>Download the PDF</a>.
-          </p>
-          </object>
-        )}
+        <div className="flex justify-center">
+          {fileUrl && (
+            <object
+              data={fileUrl}
+              type="application/pdf"
+              className="w-full"
+              height="600"
+            >
+              <p>
+                Your browser does not support PDFs.{" "}
+                <a href={fileUrl}>Download the PDF</a>.
+              </p>
+            </object>
+          )}
+        </div>
 
         <div className="mt-10 flex items-center flex-col">
-            <h2 className="text-3xl font-bold">{docName}</h2>
-            <h2 className="text-base">({docType?.toUpperCase()})</h2>
+          <h2 className="text-3xl font-bold">{docName}</h2>
+          <h2 className="text-base">({docType?.toUpperCase()})</h2>
 
-            <div className="bg-gray-100/50 border-2 w-3/5 p-4 mt-5 flex flex-col gap-4">
-                <h2 className="text-lg font-bold">Student Details</h2>
-                <h3 className="text-lg text-gray-700">Name: <b>{student?.fullName}</b></h3>
-                <h3 className="text-lg text-gray-700">Email: <b>{student?.email}</b></h3>
-            </div>
+          <div className="bg-gray-100/50 border-2 w-3/5 p-4 mt-5 flex flex-col gap-4">
+            <h2 className="text-lg font-bold">Student Details</h2>
+            <h3 className="text-lg text-gray-700">
+              Name: <b>{student?.fullName}</b>
+            </h3>
+            <h3 className="text-lg text-gray-700">
+              Email: <b>{student?.email}</b>
+            </h3>
+          </div>
 
-            <div className="flex gap-4 justify-between mt-4">
-                <button onClick={() => changeStatus(1, cid)} className="bg-blue-500 text-white font-bold px-4 py-2 rounded">
-                    Accept
-                </button>
-                <button onClick={() => changeStatus(2, cid)} className="bg-red-700 text-white font-bold px-4 py-2 rounded">
-                    Reject
-                </button>
-            </div>
+          <div className="mt-5 bg-gray-300/50 p-5 w-3/5 rounded flex flex-col gap-2">
+            <h2 className="text-lg font-bold">Purpose of verification</h2>
+            <p>{purpose}</p>
+          </div>
+
+          <div className="flex gap-4 justify-between mt-4">
+            <button
+              onClick={() => changeStatus(1, cid)}
+              className="bg-blue-500 text-white font-bold px-4 py-2 rounded"
+            >
+              Accept
+            </button>
+            <button
+              onClick={() => changeStatus(2, cid)}
+              className="bg-red-700 text-white font-bold px-4 py-2 rounded"
+            >
+              Reject
+            </button>
+          </div>
         </div>
       </div>
     </>
   );
 };
 
-const DisplayVerifierDocuments: React.FC<any> = ({ documents, fetchDocument }) => {
+const DisplayVerifierDocuments: React.FC<any> = ({
+  documents,
+  fetchDocument,
+}) => {
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
-  const {address} = useAccount()
-  const {writeContract, data : hash, isPending, error} = useWriteContract()
-  const { data: txDetails, isSuccess: transactionCompleted } = useTransactionReceipt({hash})
+  const { address } = useAccount();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { data: txDetails, isSuccess: transactionCompleted } =
+    useTransactionReceipt({ hash });
 
-  const handleDocumentStatus = async function (status : number, cid : string) {
+  const handleDocumentStatus = async function (status: number, cid: string) {
     writeContract({
-        abi: contractAbi,
-        address: contractAddress,
-        functionName: "verifyDocument",
-        args: [cid, status],
-        account: address
-    })
-  }
+      abi: contractAbi,
+      address: contractAddress,
+      functionName: "verifyDocument",
+      args: [cid, status],
+      account: address,
+    });
+  };
 
   useEffect(() => {
-
-    if(txDetails) {
-        console.log("document verification", txDetails)
-        setSelectedDoc(null)
-        fetchDocument()
+    if (txDetails) {
+      console.log("document verification", txDetails);
+      setSelectedDoc(null);
+      fetchDocument();
     }
-
-  }, [transactionCompleted])
+  }, [transactionCompleted]);
 
   return (
     <>
@@ -94,9 +122,7 @@ const DisplayVerifierDocuments: React.FC<any> = ({ documents, fetchDocument }) =
         Available Documents For Verfication
       </h1>
 
-      {
-        error && (<p>{(error as BaseError).shortMessage}</p>)
-      }
+      {error && <p>{(error as BaseError).shortMessage}</p>}
 
       {selectedDoc ? (
         <DisplaySingleDocument

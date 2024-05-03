@@ -165,14 +165,16 @@ const StudentDashboard = () => {
                 Register Document
               </Link>
             )}
-            <div className="flex justify-right">
-              <button
-                onClick={() => setDisplayAccount((val) => !val)}
-                className="bg-black text-primary font-bold px-4 py-2"
-              >
-                {displayAccount ? "Hide Account" : "Display Account"}
-              </button>
-            </div>
+            {(isStudent as Boolean) && student && (
+              <div className="flex justify-right">
+                <button
+                  onClick={() => setDisplayAccount((val) => !val)}
+                  className="bg-black text-primary font-bold px-4 py-2"
+                >
+                  {displayAccount ? "Hide Account" : "Display Account"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -195,19 +197,26 @@ const StudentDashboard = () => {
 
       {(!isStudent as Boolean) && <Onboarding register={handleSubmit} />}
 
-      {Array.isArray(availableDocuments) &&
-      isStudent &&
-      availableDocuments.length > 0 ? (
-        <DisplayStudentDocuments
-          documents={availableDocuments}
-          deleteFunc={handleDeleteDocument}
-        />
-      ) : (
-        <div className="mt-20 bg-gray-300 rounded-xl p-10 flex flex-col justify-center items-center gap-6">
-          <img src={ImageFolder} alt="Not Found" className="w-2/5 rounded" />
-          <h2 className="text-xl font-bold text-gray-800">
-            No Documents Available
-          </h2>
+      {(isStudent as Boolean) && (
+        <div>
+          {Array.isArray(availableDocuments) &&
+          availableDocuments.length > 0 ? (
+            <DisplayStudentDocuments
+              documents={availableDocuments}
+              deleteFunc={handleDeleteDocument}
+            />
+          ) : (
+            <div className="mt-20 bg-gray-300 rounded-xl p-10 flex flex-col justify-center items-center gap-6">
+              <img
+                src={ImageFolder}
+                alt="Not Found"
+                className="w-2/5 rounded"
+              />
+              <h2 className="text-xl font-bold text-gray-800">
+                No Documents Available
+              </h2>
+            </div>
+          )}
         </div>
       )}
     </>

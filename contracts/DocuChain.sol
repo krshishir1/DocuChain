@@ -30,6 +30,7 @@ contract DocuChain {
         string cid;
         string docName;
         string docType;
+        string purpose;
         address verifierAddress;
         address studentAddress;
         VerificationStatus status;
@@ -59,6 +60,7 @@ contract DocuChain {
         string memory _cid,
         string memory _name,
         string memory _docType,
+        string memory _purpose,
         address _verifierAddress,
         address _studentAddress
     ) public {
@@ -75,6 +77,7 @@ contract DocuChain {
             _cid,
             _name,
             _docType,
+            _purpose,
             _verifierAddress,
             _studentAddress,
             VerificationStatus.Pending
