@@ -23,7 +23,7 @@ const metadata: any = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [sepolias] as any;
+const chains = [sepolia] as any;
 
 export const wagmiConfig = defaultWagmiConfig({
   projectId,
