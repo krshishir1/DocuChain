@@ -11,8 +11,6 @@ import { WagmiProvider } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 
-import { bellecour } from "./config/walletChain.ts";
-
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 const projectId = "7f8f794fd9ae06bd725aa1ffa82f1b99";
@@ -25,7 +23,7 @@ const metadata: any = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [sepolia, bellecour] as any;
+const chains = [sepolias] as any;
 
 export const wagmiConfig = defaultWagmiConfig({
   projectId,
