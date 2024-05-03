@@ -24,7 +24,7 @@ const DisplayVerifier: React.FC<DisplayStudentProps> = ({
             onClick={deleteVerifier}
             className="bg-red-500 text-white px-4 py-1 rounded text-sm font-bold"
           >
-            Delete Student
+            Delete Verifier
           </button>
         </div>
       </div>

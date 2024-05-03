@@ -3,11 +3,11 @@ import Onboarding from "./Onboarding";
 import DisplayStudent from "./DisplayStudent";
 import DisplayStudentDocuments from "./DisplayStudentDocuments";
 
+import ImageFolder from "../assets/Image-folder.jpg";
+
 // 11155111, 134
 
 import { contractAbi, contractAddress } from "../config/contract";
-
-const IEXEC_EXPLORER_URL = "https://explorer.iex.ec/bellecour/dataset";
 
 import {
   type BaseError,
@@ -21,11 +21,8 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setStudent, setAvailability } from "../store/studentSlice";
 
-import { useChainId, useSwitchChain } from "wagmi";
-
 const StudentDashboard = () => {
   const [verifierList, setVerifierList] = useState<any>(null);
-  const [studentData, setStudentData] = useState<any>(null);
   const [displayAccount, setDisplayAccount] = useState(false);
 
   const { address } = useAccount();
@@ -156,24 +153,26 @@ const StudentDashboard = () => {
 
   return (
     <>
-      <div className="flex w-full justify-between">
-        <h1 className="text-2xl font-bold">Student Dashboard</h1>
-        <div className="flex gap-2 items-center">
-          {(isStudent as Boolean) && (
-            <Link
-              className="font-bold text-primary bg-black px-6 py-2"
-              to="/app/register"
-            >
-              Register Document
-            </Link>
-          )}
-          <div className="flex justify-end">
-            <button
-              onClick={() => setDisplayAccount((val) => !val)}
-              className="bg-black text-primary font-bold px-4 py-2"
-            >
-              {displayAccount ? "Hide Account" : "Display Account"}
-            </button>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-4xl font-bold">Student Dashboard</h1>
+        <div className="flex justify-end">
+          <div className="flex gap-2 items-center">
+            {(isStudent as Boolean) && (
+              <Link
+                className="font-bold text-primary bg-black px-6 py-2"
+                to="/app/register"
+              >
+                Register Document
+              </Link>
+            )}
+            <div className="flex justify-right">
+              <button
+                onClick={() => setDisplayAccount((val) => !val)}
+                className="bg-black text-primary font-bold px-4 py-2"
+              >
+                {displayAccount ? "Hide Account" : "Display Account"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -196,11 +195,20 @@ const StudentDashboard = () => {
 
       {(!isStudent as Boolean) && <Onboarding register={handleSubmit} />}
 
-      {Array.isArray(availableDocuments) && isStudent && (
+      {Array.isArray(availableDocuments) &&
+      isStudent &&
+      availableDocuments.length > 0 ? (
         <DisplayStudentDocuments
           documents={availableDocuments}
           deleteFunc={handleDeleteDocument}
         />
+      ) : (
+        <div className="mt-20 bg-gray-300 rounded-xl p-10 flex flex-col justify-center items-center gap-6">
+          <img src={ImageFolder} alt="Not Found" className="w-2/5 rounded" />
+          <h2 className="text-xl font-bold text-gray-800">
+            No Documents Available
+          </h2>
+        </div>
       )}
     </>
   );

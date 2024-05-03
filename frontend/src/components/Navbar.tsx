@@ -21,18 +21,18 @@ const Navbar = () => {
           </Typography>
         </Link>
         <Link to="/features">
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          <h3 className="text-xl font-bold">
             Features
-          </Typography>
+          </h3>
         </Link>
       </div>
 
       <div className="flex justify-between items-center">
         {address && (
           <Link to="/app">
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            <h3 className="text-xl font-bold">
               Dashboard
-            </Typography>
+            </h3>
           </Link>
         )}
         <div>
