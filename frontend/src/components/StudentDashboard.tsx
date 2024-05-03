@@ -3,12 +3,11 @@ import Onboarding from "./Onboarding";
 import DisplayStudent from "./DisplayStudent";
 import DisplayStudentDocuments from "./DisplayStudentDocuments";
 
+import ImageFolder from "../assets/Image-folder.jpg";
+
 // 11155111, 134
 
 import { contractAbi, contractAddress } from "../config/contract";
-import { IExecDataProtector } from "@iexec/dataprotector";
-
-const IEXEC_EXPLORER_URL = "https://explorer.iex.ec/bellecour/dataset";
 
 import {
   type BaseError,
@@ -16,26 +15,17 @@ import {
   useWriteContract,
   useTransactionReceipt,
   useAccount,
-  Connector,
 } from "wagmi";
 import { useEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
 import { setStudent, setAvailability } from "../store/studentSlice";
 
-import { useChainId, useSwitchChain } from "wagmi";
-
 const StudentDashboard = () => {
   const [verifierList, setVerifierList] = useState<any>(null);
-  const [protectedAddress, setProtectedAddress] = useState<any>();
-  const [studentData, setStudentData] = useState<any>(null);
   const [displayAccount, setDisplayAccount] = useState(false);
 
   const { address } = useAccount();
-  const { connector } = useAccount() as { connector: Connector };
-
-  const chainId = useChainId();
-  const { isSuccess: chainSwitched, switchChain } = useSwitchChain();
 
   const {
     data: isStudent,
@@ -87,7 +77,14 @@ const StudentDashboard = () => {
 
   const handleSubmit = async function (studentData: any) {
     try {
-      console.log("studentData", studentData);
+      const { fullName, email, gender } = studentData;
+      writeContract({
+        abi: contractAbi,
+        address: contractAddress,
+        functionName: "addStudentDetails",
+        args: [fullName, email, gender],
+        account: address,
+      });
     } catch (error: any) {
       console.log("error", error);
     }
@@ -115,27 +112,6 @@ const StudentDashboard = () => {
       account: address,
     });
   };
-
-  useEffect(() => {
-    async function fetchData() {
-      if (address && connector) {
-        const provider = await connector.getProvider();
-        const dataProtector = new IExecDataProtector(provider);
-
-        const response = await dataProtector.fetchProtectedData({
-          owner: address,
-        });
-
-        if (response) {
-          const protectedData = response.pop();
-          console.log("protectedData", protectedData);
-          setProtectedAddress(protectedData?.address);
-        }
-      }
-    }
-
-    fetchData();
-  }, [connector]);
 
   useEffect(() => {
     console.log("hashing");
@@ -175,124 +151,74 @@ const StudentDashboard = () => {
     }
   }, [verifiers]);
 
-  useEffect(() => {
-    async function sendData() {
-      if (studentData && chainId === 134) {
-        if (address && connector) {
-          console.log("sending data to protect", studentData);
-
-          const provider = await connector.getProvider();
-          const dataProtector = new IExecDataProtector(provider);
-
-          const response = await dataProtector.protectData({
-            data: studentData,
-            name: "student-details",
-          });
-
-          if (!response) {
-            throw new Error("Error in protecting data");
-          }
-
-          setProtectedAddress(response?.address);
-          localStorage.setItem("protectedAddress", response?.address);
-
-          switchChain({ chainId: 11155111 });
-        }
-      }
-
-      if (studentData && chainId === 11155111) {
-        const { fullName, email, gender } = studentData;
-        writeContract({
-          abi: contractAbi,
-          address: contractAddress,
-          functionName: "addStudentDetails",
-          args: [fullName, email, gender],
-          account: address,
-        });
-      }
-    }
-
-    sendData();
-  }, [chainSwitched]);
-
-  //   console.log(availableDocuments);
-
   return (
     <>
-      <div className="flex w-full justify-between">
-        <h1 className="text-2xl font-bold">Student Dashboard</h1>
-        {(isStudent as Boolean) && (
-          <Link
-            className="font-bold text-primary bg-black px-6 py-3 rounded"
-            to="/app/register"
-          >
-            Register Document
-          </Link>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-4xl font-bold">Student Dashboard</h1>
+        <div className="flex justify-end">
+          <div className="flex gap-2 items-center">
+            {(isStudent as Boolean) && (
+              <Link
+                className="font-bold text-primary bg-black px-6 py-2"
+                to="/app/register"
+              >
+                Register Document
+              </Link>
+            )}
+            {(isStudent as Boolean) && student && (
+              <div className="flex justify-right">
+                <button
+                  onClick={() => setDisplayAccount((val) => !val)}
+                  className="bg-black text-primary font-bold px-4 py-2"
+                >
+                  {displayAccount ? "Hide Account" : "Display Account"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        {displayAccount && (
+          <DisplayStudent
+            pending={isPending}
+            student={student as any}
+            deleteStudent={handleDelete}
+          />
         )}
       </div>
 
-      <div>
-        {/* <p>{status}</p>
-
-        <div>
-          <p>Available chains: </p>
-          <div className="flex gap-2"></div>
-        </div> */}
-
-        <p>Current chain: {chainId}</p>
-
+      <div className="my-4">
         {error && (
           <p className="text-red-500">{(error as BaseError).shortMessage}</p>
         )}
       </div>
 
-      {(!isStudent as Boolean) && (
-        <Onboarding
-          register={handleSubmit}
-          setStudent={setStudentData}
-          switchNetwork={switchChain}
-        />
-      )}
-      {(isStudent as Boolean) && student && (
-        <div className="mt-10">
-          <button
-            onClick={() => setDisplayAccount((val) => !val)}
-            className="bg-black text-primary font-bold rounded-xl px-4 py-2 mb-5"
-          >
-            {displayAccount ? "Hide Account" : "Display Account"}
-          </button>
-          {displayAccount && (
-            <DisplayStudent
-              pending={isPending}
-              student={student as any}
-              deleteStudent={handleDelete}
+      {(!isStudent as Boolean) && <Onboarding register={handleSubmit} />}
+
+      {(isStudent as Boolean) && (
+        <div>
+          {Array.isArray(availableDocuments) &&
+          availableDocuments.length > 0 ? (
+            <DisplayStudentDocuments
+              documents={availableDocuments}
+              deleteFunc={handleDeleteDocument}
             />
+          ) : (
+            <div className="mt-20 bg-gray-300 rounded-xl p-10 flex flex-col justify-center items-center gap-6">
+              <img
+                src={ImageFolder}
+                alt="Not Found"
+                className="w-2/5 rounded"
+              />
+              <h2 className="text-xl font-bold text-gray-800">
+                No Documents Available
+              </h2>
+            </div>
           )}
         </div>
       )}
-
-      {protectedAddress && isStudent && (
-        <div className="bg-green-300/50 p-5 rounded-xl text-gray-700">
-          <h2 className="text-lg mb-4 font-bold">
-            Your data has been protected!
-          </h2>
-          <a
-            className="underline"
-            href={`${IEXEC_EXPLORER_URL}/${protectedAddress}`}
-          >
-            You can check it here!
-          </a>
-        </div>
-      )}
-
-      {Array.isArray(availableDocuments) &&
-        availableDocuments.length &&
-        isStudent && (
-          <DisplayStudentDocuments
-            documents={availableDocuments}
-            deleteFunc={handleDeleteDocument}
-          />
-        )}
     </>
   );
 };

@@ -5,6 +5,7 @@ import DisplayVerifier from "./DisplayVerifier";
 import DisplayVerifierDocuments from "./DisplayVerifierDocuments";
 
 import { contractAbi, contractAddress } from "../config/contract";
+import ImageFolder from "../assets/Image-folder.jpg";
 
 import { useDispatch } from "react-redux";
 import { setVerifier, setAvailability } from "../store/verifierSlice";
@@ -89,26 +90,31 @@ const VerifierDashboard = () => {
   return (
     <>
       <div className="flex justify-between">
-        <h1 className="text-2xl font-bold">Verifier Dashboard</h1>
+        <h1 className="text-4xl font-bold">Verifier Dashboard</h1>
 
         {(!isVerifier as boolean) && (
           <Link
             to="/app/institute"
-            className="font-bold text-primary bg-black px-6 py-3 rounded"
+            className="font-bold text-primary bg-black px-6 py-2"
           >
             Register Institute
           </Link>
+        )}
+
+        {(isVerifier as boolean) && verifier && (
+          <div>
+            <button
+              onClick={() => setDisplayAccount((val) => !val)}
+              className="bg-black text-primary font-bold px-6 py-2 mb-5"
+            >
+              {displayAccount ? "Hide Account" : "Display Account"}
+            </button>
+          </div>
         )}
       </div>
 
       {isVerifier && verifier && (
         <div className="mt-10">
-          <button
-            onClick={() => setDisplayAccount((val) => !val)}
-            className="bg-black text-primary font-bold rounded-xl px-4 py-2 mb-5"
-          >
-            {displayAccount ? "Hide Account" : "Display Account"}
-          </button>
           {displayAccount && (
             <DisplayVerifier
               pending={isPending}
@@ -119,14 +125,21 @@ const VerifierDashboard = () => {
         </div>
       )}
 
-      {isVerifier &&
-        Array.isArray(availableDocuments) &&
-        availableDocuments.length && (
-          <DisplayVerifierDocuments
-            documents={availableDocuments}
-            fetchDocument={getAvailableDocuments}
-          />
-        )}
+      {Array.isArray(availableDocuments) &&
+      isVerifier &&
+      availableDocuments.length > 0 ? (
+        <DisplayVerifierDocuments
+          documents={availableDocuments}
+          fetchDocument={getAvailableDocuments}
+        />
+      ) : (
+        <div className="mt-20 bg-gray-300 rounded-xl p-10 flex flex-col justify-center items-center gap-6">
+          <img src={ImageFolder} alt="Not Found" className="w-2/5 rounded" />
+          <h2 className="text-xl font-bold text-gray-800">
+            No Documents Available For Verification
+          </h2>
+        </div>
+      )}
     </>
   );
 };

@@ -7,7 +7,7 @@ interface OnboardingProps {
 
 import { useSwitchChain } from "wagmi";
 
-const Onboarding : React.FC<any> = ({register, setStudent, switchNetwork}) => {
+const Onboarding : React.FC<any> = ({register, setStudent}) => {
   const [currentStepNum, setCurrentStepNum] = useState(0);
 
   const {switchChain} = useSwitchChain();
@@ -32,10 +32,7 @@ const Onboarding : React.FC<any> = ({register, setStudent, switchNetwork}) => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setStudent(values);
-    switchNetwork({chainId: 134})
-
-    // await register(values);
+    register(values);
   }
 
   return (

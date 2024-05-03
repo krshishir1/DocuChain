@@ -13,15 +13,15 @@ const DisplayStudent: React.FC<DisplayStudentProps> = ({
   return (
     <div className="w-3/5 mx-auto bg-gray-300/50 border-2 p-5">
       <h1 className="text-2xl font-bold mb-5">Account Details</h1>
-      <div className="flex justify-between text-lg">
+      <div className="flex flex-col gap-4 text-lg">
         <h2>Name: {fullName}</h2>
         <h3>Email: {email}</h3>
 
         <button
           onClick={deleteStudent}
-          className="bg-red-500 text-white px-4 py-1 rounded text-sm font-bold"
+          className="bg-red-500 text-white px-4 py-2 rounded text-sm font-bold"
         >
-          Delete Student
+          Delete Student Data
         </button>
       </div>
     </div>
