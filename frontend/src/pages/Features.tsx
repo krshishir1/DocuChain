@@ -52,7 +52,7 @@ const Features = () => {
       <div className="flex-1 bg-black pb-24 pt-56">
         <div className="md:w-1/2 mx-auto flex flex-col gap-16">
           <div className="text-white">
-            <h1 className="text-gray-100 text-5xl text-center">
+            <h1 className="text-gray-100 text-5xl font-bold text-center">
               Value Proposition
             </h1>
 
