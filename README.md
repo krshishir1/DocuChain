@@ -1,13 +1,16 @@
-# Sample Hardhat Project
+# DocuChain
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+DocuChain revolutionizes document sharing and verification by providing a secure, decentralized platform that connects students and educational institutes seamlessly. 
 
-Try running some of the following tasks:
+With DocuChain, users can securely share and verify academic documents, transcripts, certificates, and more, all while maintaining the integrity and authenticity of the information.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
+Contract Address - 0xf6EA23DA1A9F296F196a38F30d4133A8e92DEC36
+
+## Technologies Used
+
+- Solidity
+- Hardhat
+- Hardhat
+- Tailwind
+- Wagmi
+
