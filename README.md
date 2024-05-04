@@ -6,11 +6,12 @@ With DocuChain, users can securely share and verify academic documents, transcri
 
 Contract Address - 0xf6EA23DA1A9F296F196a38F30d4133A8e92DEC36
 
+
 ## Technologies Used
 
 - Solidity
 - Hardhat
-- Hardhat
+- React
 - Tailwind
 - Wagmi
 

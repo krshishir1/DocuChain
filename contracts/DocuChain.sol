@@ -32,7 +32,7 @@ contract DocuChain {
         string docType;
         string purpose;
         address verifierAddress;
-        address studentAddress;
+        address studentAddress; 
         VerificationStatus status;
     }
 
